@@ -4,14 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeObjHolder>{
 
@@ -55,11 +56,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeObjH
     public class RecipeObjHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        private TextView textView;
+            @BindView(R.id.tv_recipe_name) TextView textView;
 
         public RecipeObjHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.tv_recipe_name);
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(this);
         }

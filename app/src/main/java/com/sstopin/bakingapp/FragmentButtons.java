@@ -4,15 +4,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import java.util.HashMap;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 
 public class FragmentButtons extends Fragment {
+
+    private Unbinder unbinder;
 
     public FragmentButtons() {
 
@@ -21,9 +22,13 @@ public class FragmentButtons extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.buttons_fragment, container, false);
-
-     //   LinearLayout linearLayout = rootView.findViewById(R.id.ll_buttons);
+        unbinder = ButterKnife.bind(this, rootView);
 
         return rootView;
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }

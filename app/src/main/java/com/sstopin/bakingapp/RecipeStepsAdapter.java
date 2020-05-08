@@ -8,9 +8,14 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.StepsObjHolder>{
 
@@ -22,7 +27,7 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
     }
 
     public RecipeStepsAdapter(Context mcontext, ArrayList<HashMap> recipeObjIn,
-                              RecipeSteps listener){
+                              RecyclerViewClickListener listener){
         Context mContext=mcontext;
         mStepsObjList =recipeObjIn;
         mOnClickListener= (RecyclerViewClickListener) listener;
@@ -55,11 +60,11 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
     public class StepsObjHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        private TextView textView;
+        @BindView(R.id.tv_recipe_steps) TextView textView;
 
         public StepsObjHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.tv_recipe_steps);
+            ButterKnife.bind(this, itemView);
 
             itemView.setOnClickListener(this);
         }

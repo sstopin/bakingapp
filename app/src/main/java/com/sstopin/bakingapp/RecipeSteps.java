@@ -3,6 +3,7 @@ package com.sstopin.bakingapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import butterknife.OnClick;
 
 public class RecipeSteps extends AppCompatActivity
         implements RecipeStepsAdapter.RecyclerViewClickListener{
@@ -26,24 +29,46 @@ public class RecipeSteps extends AppCompatActivity
     private String mImage;
     private RecipeInfo mRecipeInfo;
 
+    private boolean mLargeScreen;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recipe_steps_main);
 
-        stepsRecyclerView = findViewById(R.id.rv_recipe_steps);
+        if (findViewById(R.id.fl_steps_large_screen) != null) {
+            mLargeScreen = true;
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 1);
-        stepsRecyclerView.setLayoutManager(layoutManager);
-        stepsRecyclerView.setHasFixedSize(true);
+            stepsRecyclerView = findViewById(R.id.rv_recipe_steps);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            Intent intent = getIntent();
+            mRecipeInfo = intent.getParcelableExtra("RecipeSteps");
+            getIntent().getParcelableExtra("RecipeSteps");
 
+            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+            stepsRecyclerView.setLayoutManager(layoutManager);
+            stepsRecyclerView.setHasFixedSize(true);
 
-        Intent intent = getIntent();
-        mRecipeInfo = intent.getParcelableExtra("RecipeSteps");
-        getIntent().getParcelableExtra("RecipeSteps");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            mLargeScreen = false;
+            stepsRecyclerView = findViewById(R.id.rv_recipe_steps);
+
+            if (savedInstanceState != null) {
+                mRecipeInfo = savedInstanceState.getParcelable("RecipeStepsSaved");
+            } else {
+                Intent intent = getIntent();
+                mRecipeInfo = intent.getParcelableExtra("RecipeSteps");
+                getIntent().getParcelableExtra("RecipeSteps");
+            }
+            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 1);
+            stepsRecyclerView.setLayoutManager(layoutManager);
+            stepsRecyclerView.setHasFixedSize(true);
+
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
 
         mId = mRecipeInfo.getId();
         mName = mRecipeInfo.getName();
@@ -51,6 +76,7 @@ public class RecipeSteps extends AppCompatActivity
         mStepsArray = mRecipeInfo.getStepsArray();
         mServings = mRecipeInfo.getServings();
         mImage = mRecipeInfo.getImage();
+
 
         this.setTitle(mName);
 
@@ -65,10 +91,15 @@ public class RecipeSteps extends AppCompatActivity
         Intent startActivityIntent = new Intent(context, destinationClass);
 
         HashMap hashMap = new HashMap(mStepsArray.get(position));
-        int stepId = (int) hashMap.get("id");
+        String stepId = (String) hashMap.get("id");
         startActivityIntent.putExtra("stepId", stepId);
         startActivityIntent.putExtra("recipeInfo", mRecipeInfo);
         startActivity(startActivityIntent);
 
+    }
+
+    @OnClick(android.R.id.home)
+    public void endProcess (){
+        finish();
     }
 }

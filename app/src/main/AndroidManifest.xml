@@ -17,7 +17,7 @@
             android:parentActivityName=".MainActivity">
         </activity>
         <activity android:name=".RecipeDetails"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".RecipeSteps">
         </activity>
 
         <activity android:name=".MainActivity">

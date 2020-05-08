@@ -1,21 +1,15 @@
 package com.sstopin.bakingapp;
 
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 
 public class MainActivity extends AppCompatActivity
         implements RecipeAdapter.RecyclerViewClickListener {
@@ -35,27 +30,38 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<HashMap> mIngredientsArray = new ArrayList<HashMap>();
     private ArrayList<HashMap> mStepsArray = new ArrayList<HashMap>();
 
+    private boolean mLargeScreen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(getApplicationContext(),
-                        Manifest.permission.INTERNET ) != PackageManager.PERMISSION_GRANTED) {
-            return  ;
+        if (findViewById(R.id.fl_largeScreen) != null) {
+            mLargeScreen = true;
+            recyclerView = findViewById(R.id.rv_recipe);
+
+            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setHasFixedSize(true);
+
+            mAdapter = new RecipeAdapter(getApplicationContext(), mBakingInfoArray, this);
+            recyclerView.setAdapter(mAdapter);
+
+            new GetBakingInfo().execute(NetworkUtils.getBakingUrl());
+        } else {
+            mLargeScreen = false;
+            recyclerView = findViewById(R.id.rv_recipe);
+
+            RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 1);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setHasFixedSize(true);
+
+            mAdapter = new RecipeAdapter(getApplicationContext(), mBakingInfoArray, this);
+            recyclerView.setAdapter(mAdapter);
+
+            new GetBakingInfo().execute(NetworkUtils.getBakingUrl());
         }
-
-        recyclerView = findViewById(R.id.rv_recipe);
-
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 1);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-
-        mAdapter = new RecipeAdapter(getApplicationContext(), mBakingInfoArray, this);
-        recyclerView.setAdapter(mAdapter);
-
-        new GetBakingInfo().execute(NetworkUtils.getBakingUrl());
     }
 
     @Override
@@ -120,12 +126,17 @@ public class MainActivity extends AppCompatActivity
                         mStepsArray = new ArrayList<>();
                         HashMap stepsMap = new HashMap();
                         for (int y = 0; y < stepsArrayJSON.length(); y++){
-                //            if (y == 0) {
-                //                stepsMap.put("shortDescription", "Recipe Ingredients");
-                //                mStepsArray.add(stepsMap);
-                //                stepsMap = new HashMap();
-                //            }
-                            stepsMap.put("id", stepsArrayJSON.getJSONObject(y).optInt("id"));
+                            if (y == 0) {
+                                stepsMap.put("id", "I");
+                                stepsMap.put("shortDescription", "Recipe Ingredients");
+                                stepsMap.put("description", "");
+                                stepsMap.put("videoURL", "");
+                                stepsMap.put("thumbnailURL", "");
+                                mStepsArray.add(stepsMap);
+                                stepsMap = new HashMap();
+                            }
+                            int tempId = stepsArrayJSON.getJSONObject(y).getInt("id");
+                            stepsMap.put("id", String.valueOf(tempId));
                             stepsMap.put("shortDescription", stepsArrayJSON.getJSONObject(y).optString("shortDescription"));
                             stepsMap.put("description", stepsArrayJSON.getJSONObject(y).optString("description"));
                             stepsMap.put("videoURL", stepsArrayJSON.getJSONObject(y).optString("videoURL"));
@@ -140,7 +151,7 @@ public class MainActivity extends AppCompatActivity
                                 servings, image));
                     }
                 }
-//                recyclerView.swapAdapter(mAdapter, false);
+                recyclerView.setAdapter(mAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
