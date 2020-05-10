@@ -1,17 +1,24 @@
 package com.sstopin.bakingapp;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import butterknife.OnClick;
 
@@ -28,6 +35,7 @@ public class RecipeSteps extends AppCompatActivity
     private String mServings;
     private String mImage;
     private RecipeInfo mRecipeInfo;
+    private WidgetService myWidgetRemoteViewsFactory;
 
     private boolean mLargeScreen;
 
@@ -73,6 +81,27 @@ public class RecipeSteps extends AppCompatActivity
         mId = mRecipeInfo.getId();
         mName = mRecipeInfo.getName();
         mIngredientsArray = mRecipeInfo.getIngredientsArray();
+
+        ArrayList<String> sharedIngredients = new ArrayList<String>();
+        for (int i = 0;i < mIngredientsArray.size();i++){
+            HashMap tempHashMap = mIngredientsArray.get(i);
+            sharedIngredients.add((String) tempHashMap.get("ingredient"));
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(sharedIngredients);
+        editor.putString("IngredientsList", json);
+        editor.apply();
+
+        Intent intent = new Intent(this, WidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(getApplicationContext())
+                .getAppWidgetIds(new ComponentName(getApplication(), WidgetProvider.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, ids);
+        sendBroadcast(intent);
+
         mStepsArray = mRecipeInfo.getStepsArray();
         mServings = mRecipeInfo.getServings();
         mImage = mRecipeInfo.getImage();
