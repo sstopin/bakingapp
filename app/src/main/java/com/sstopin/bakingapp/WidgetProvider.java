@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.widget.RemoteViews;
 
 
@@ -15,11 +14,17 @@ public class WidgetProvider extends AppWidgetProvider
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
             int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredients_widget_layout);
+        Intent intent = new Intent(context, WidgetService.class);
 
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        views.setRemoteAdapter(R.id.widgetListView, intent);
 
-        views.setOnClickPendingIntent(R.id.empty_view, pendingIntent);
+
+        Intent intentMain = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentMain, 0);
+        views.setOnClickPendingIntent(R.layout.ingredients_widget_item, pendingIntent);
+
+  //          views.setOnClickPendingIntent(R.id.empty_view, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
@@ -53,6 +58,8 @@ public class WidgetProvider extends AppWidgetProvider
     {
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
+
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widgetListView);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }

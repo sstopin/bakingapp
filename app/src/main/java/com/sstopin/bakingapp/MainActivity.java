@@ -7,9 +7,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +75,11 @@ public class MainActivity extends AppCompatActivity
         Class destinationClass = RecipeSteps.class;
         Intent startActivityIntent = new Intent(context, destinationClass);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("currentRecipeId",
+                String.valueOf(mBakingInfoArray.get(position).getId())).apply();
+
         startActivityIntent.putExtra("RecipeSteps", mBakingInfoArray.get(position));
         startActivity(startActivityIntent);
     }
@@ -121,6 +131,13 @@ public class MainActivity extends AppCompatActivity
                             mIngredientsArray.add(ingredientsMap);
                             ingredientsMap = new HashMap();
                         }
+
+                        Gson gson = new Gson();
+                        String arrayListString = gson.toJson(mIngredientsArray);
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString(String.valueOf(id), arrayListString).apply();
+
                         String steps = bakingArrayJSON.getJSONObject(i).optString("steps");
                         JSONArray stepsArrayJSON = new JSONArray(steps);
                         mStepsArray = new ArrayList<>();

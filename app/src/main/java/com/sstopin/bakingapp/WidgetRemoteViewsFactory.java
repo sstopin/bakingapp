@@ -4,24 +4,20 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.w3c.dom.Text;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
 {
@@ -32,14 +28,11 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     public WidgetRemoteViewsFactory(Context context, Intent intent)
     {
- //       this.context = context;
- //       appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
- //               AppWidgetManager.INVALID_APPWIDGET_ID);
+        this.context = context;
+        appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID);
     }
 
-    private void updateWidgetListView() throws JSONException {
-
-    }
 
     @Override
     public int getCount()
@@ -85,55 +78,31 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
     @Override
     public void onCreate()
     {
-//        try {
-//            updateWidgetListView();
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
     public void onDataSetChanged() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-//        Gson gson = new Gson();
-//        String json = prefs.getString("IngredientsList", null);
-//
-//        JSONArray jsonArray = null;
-//        try {
-//            jsonArray = new JSONArray(json);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        String[] widgetIngredientsArray = new String[jsonArray.length()];
-//
-//        for (int i = 0; i < jsonArray.length(); i++) {
-//            try {
-//                widgetIngredientsArray[i] = jsonArray.getString(i);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        List<String> convertedToList = new ArrayList<String>(Arrays.asList(widgetIngredientsArray));
-//        this.widgetList = convertedToList;
-//
-//
-//        RemoteViews rv = new RemoteViews(context.getPackageName(),
-//                R.layout.ingredients_widget_layout);
-//
-//        Intent intent = new Intent(context, WidgetService.class);
-//        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-//                appWidgetIds[i]);
-//
-//        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-//        intent.setData(Uri.fromParts("content", String.valueOf(appWidgetIds[i]), null));
-//
-//        rv.setRemoteAdapter(R.id.widgetListView, intent);
-//        rv.setEmptyView(R.id.widgetListView, R.id.empty_view);
-//
-//        appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
-//        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds[i], R.id.widgetListView);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        String currentRecipeId = pref.getString("currentRecipeId", "Not Found");
 
+        String ingredientsList = pref.getString(currentRecipeId, "No Ingredients");
+
+        try {
+            JSONArray ingredientsArrayJSON = new JSONArray(ingredientsList);
+            if (ingredientsArrayJSON.length() > 0) {
+                int numOfItems = ingredientsArrayJSON.length();
+                String[] ingredientsDisplayList = new String[numOfItems];
+                for (int i = 0; i < numOfItems; i++) {
+                    String quantity = ingredientsArrayJSON.getJSONObject(i).optString("quantity");
+                    String measure = ingredientsArrayJSON.getJSONObject(i).optString("measure");
+                    String ingredient = ingredientsArrayJSON.getJSONObject(i).optString("ingredient");
+                    ingredientsDisplayList[i] = ingredient + "\n" + quantity + " " + measure;
+                }
+                widgetList = Arrays.asList(ingredientsDisplayList);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

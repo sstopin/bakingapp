@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,30 +83,13 @@ public class RecipeSteps extends AppCompatActivity
         mId = mRecipeInfo.getId();
         mName = mRecipeInfo.getName();
         mIngredientsArray = mRecipeInfo.getIngredientsArray();
-
-        ArrayList<String> sharedIngredients = new ArrayList<String>();
-        for (int i = 0;i < mIngredientsArray.size();i++){
-            HashMap tempHashMap = mIngredientsArray.get(i);
-            sharedIngredients.add((String) tempHashMap.get("ingredient"));
-        }
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(sharedIngredients);
-        editor.putString("IngredientsList", json);
-        editor.apply();
-
-        Intent intent = new Intent(this, WidgetProvider.class);
-        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        int[] ids = AppWidgetManager.getInstance(getApplicationContext())
-                .getAppWidgetIds(new ComponentName(getApplication(), WidgetProvider.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, ids);
-        sendBroadcast(intent);
-
         mStepsArray = mRecipeInfo.getStepsArray();
         mServings = mRecipeInfo.getServings();
         mImage = mRecipeInfo.getImage();
+
+
+   //     SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+   //     String currentRecipeId = pref.getString("currentRecipeId", "Not Found");
 
 
         this.setTitle(mName);
