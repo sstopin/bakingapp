@@ -28,7 +28,7 @@ public class WidgetProvider extends AppWidgetProvider
  //       views.setOnClickPendingIntent(R.layout.ingredients_widget_item, pendingIntent);
         views.setPendingIntentTemplate(R.id.widgetListView, pendingIntent);
 
-  //          views.setOnClickPendingIntent(R.id.empty_view, pendingIntent);
+  //    //      views.setOnClickPendingIntent(R.id.empty_view, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
