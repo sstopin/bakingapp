@@ -88,10 +88,6 @@ public class RecipeSteps extends AppCompatActivity
         mImage = mRecipeInfo.getImage();
 
 
-   //     SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-   //     String currentRecipeId = pref.getString("currentRecipeId", "Not Found");
-
-
         this.setTitle(mName);
 
         mRecipeStepsAdapter = new RecipeStepsAdapter(getApplicationContext(), mStepsArray, this);

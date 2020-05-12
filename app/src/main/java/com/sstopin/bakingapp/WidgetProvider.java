@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.widget.RemoteViews;
 
 
@@ -17,12 +18,15 @@ public class WidgetProvider extends AppWidgetProvider
         Intent intent = new Intent(context, WidgetService.class);
 
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         views.setRemoteAdapter(R.id.widgetListView, intent);
+        views.setEmptyView(R.id.widgetListView, R.id.empty_view);
 
 
         Intent intentMain = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentMain, 0);
-        views.setOnClickPendingIntent(R.layout.ingredients_widget_item, pendingIntent);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentMain, PendingIntent.FLAG_UPDATE_CURRENT);
+ //       views.setOnClickPendingIntent(R.layout.ingredients_widget_item, pendingIntent);
+        views.setPendingIntentTemplate(R.id.widgetListView, pendingIntent);
 
   //          views.setOnClickPendingIntent(R.id.empty_view, pendingIntent);
 
